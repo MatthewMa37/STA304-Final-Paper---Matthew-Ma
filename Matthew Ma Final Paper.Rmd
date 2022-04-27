@@ -1,0 +1,259 @@
+---
+title: "**Toronto Under The Pandemic**"
+subtitle: "How did Covid-19 impact Toronto in the past different stages and the Future"
+author: "**Matthew Ma**"
+output:
+  pdf_document: default
+  html_document: default
+date: '2022-04-20'
+
+bibliography: references.bib
+nocite: '@*'
+
+
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Abstract**
+
+After the outbreak of Covid-19 in the end of 2019, the world has entered a tumultuous phase with Pandemic, which has raised global economic, health and livelihood issues. Millions of people have suffered terribly due to the pandemic, even in relatively developed regions like North America, uncontrolled deaths, medical shortages, and subsequent economic downturns and job losses due to policies.
+
+In this research paper, Toronto, a representative city in North America which is recognized as a first-tier developed city in the world, will be taken as an example to study the impact of the Covid-19 through the different stages of the pandemic from the perspective of statistics and to conduct the social context.
+
+In this research paper, the researcher will classify the different stages people experienced from when the pandemic arrived in Toronto until now based on the data obtained from Open Data Toronto, an official government-supported open data website. On this basis, study the corresponding growing tendency, mortality rate, infection rate, and other characteristics of different stages and analyze the impact from every different pandemic stage. Lastly, the future of the Covid-19 pandemic in Toronto is discussed by combining the social situation with the model summarized from the data.
+
+The whole paper will be presented in the form of R Markdown. The Cleaning process and the model-making procedure will be conducted by R studio. All related data and the clean-up process for the data are simultaneously uploaded, so this paper is fully reproducible.
+
+
+# **1 Introduction**
+
+
+## 1.1 Investigation Purpose it's Back Ground
+
+
+COVID-19, also known as SARS-COV-2, is a severe respiratory composite coronavirus characterized by high infectivity, a long incubation period, and a tendency to cause respiratory symptoms such as pneumonia and fever @b.
+
+The first patient of this virus was found in Hubei, China, at the end of 2019, and since then, the virus has gradually spread around the world with high interactivity, becoming a global virus @b. So far, more than 500 million people have been diagnosed with the virus or a variant of it. It also became the deadliest virus in human history @b.
+
+Now, after more than two years, vaccines developed by humans against the COVID-19 virus have been widely distributed around the world; as well as the mutation characteristics of the virus itself, the death rate of the virus has dropped significantly, and it has gradually become a flu-like virus.
+
+In those two years, especially before the virus mutated and before a vaccine was widely available, the management to limit the disease's spread led to severe global livelihood problems and economic decline. Take North America, one of the most developed regions globally, as an example. At the beginning of 2020, the virus gradually entered the United States and Canada @b. The pandemic in China also quickly spread to the whole world, making the pandemic enter a stage of global log in.
+
+Since then, due to the outbreak from 2020 to 2021, people again fought against the pandemic in the early stage. The lockdown measures taken to prevent the spread of the virus have caused many people to lose their jobs and their economies to suffer. Airlines and stock markets in many countries have suffered circuit breakers and crashes. In addition, many work units and universities have adopted online working or teaching methods to cope with the pandemic.
+
+Later, with the popularization of vaccines, the variation of the virus, and the impact on people's economic level and living standards, the pandemic's stage gradually changed from an uncontrollable stage to a controllable stage. Take Toronto as an example, the lockdown action gradually decreased, and many schools started to restore the offline teaching mode.
+
+Now, just when the pandemic was thought to be improving, the latest version of the novel coronavirus, Omicron, broke out again in late 2021 with an unprecedented rate of transmission that the previous variant did not, pushing the world into a whole new stage.
+
+According to the information above, people's attitudes towards the pandemic are also changing with the stage change. Therefore, the impact of Covid-19 also varies with the previous two factors. Intuitively, we can say that people have gone through three different stages by now, and the pandemic's impact on people is also changing dramatically in these different stages.
+
+In this paper, I will take Toronto, a first-tier developed city in the world, as an example and adopt the public data provided by Open Data Toronto, supported by the government of Ontario, Canada, to classify the pandemic into three different stages from 2020 to now based on social reality. Moreover, the characteristics of this set of data in the three stages will be compared, and a model will be generated based on this data set. Based on the above steps, I will analyze how the trend of the Covid-19 affects people's lives in Toronto from 2020 to now and the future influence of this pandemic in Toronto and its social impact.
+
+## 1.2 Research methodology
+
+In order to make this study more meaningful, as mentioned above, the pandemic in Toronto will be divided into three different stages, respectively pre-vaccine stage, post-vaccine stage, and Omicron stage. 
+
+Since the impact of the pandemic on people in these three stages is entirely different, it is of great significance to study the information provided by the data and analyze the hidden social impact by grouping the data in time.
+
+**Division of Stages**
+
+#### Stage1: pre- vaccine stage:
+
+Covid-19 was brought to the world by people travelling from country to country and gradually localized across the globe. The pre-vaccine stage is the first stage when the pandemic has already started to spread in Toronto, and there is no universal vaccine. The beginning of this phase was when the first cases were reported in Toronto, and the end of this phase was when the vaccine began to be widely available. According to information provided by the Government of Canada, the overall vaccination rate across Canada exceeded 70 percent on 21 July 2021. This represents that Canada has achieved the requirement of universal immunization since then. To sum up, we set July 20, 2021, as the first phase.
+
+#### Stage2: post- vaccine stage
+
+When the vaccine became widely available in Toronto, the fear of the outbreak diminished dramatically, so life gradually began to return to normal, and the infection rate changed. This phase starts on July 21, 2021, when universal immunization standards are reached and can be roughly classified as a phase in which Omicron has not yet appeared before December 2021.
+
+
+#### Stage 3: Omicron Stage:
+
+When Omicron Virant emerged, infection rates soared because resistance to the vaccine fell sharply. But because the mutant virus had a low fatality rate and was moving the pandemic closer to flu, the Toronto government reversed most of its COVID-19 policies. So far, December 2021 can be understood as the starting point of STAGE3.
+
+
+
+```{r,include=FALSE}
+
+
+library(readr)
+library(dplyr)
+
+COVID19_cases <- read_csv("COVID19 cases.csv")
+
+
+filtered_data <- select(COVID19_cases,'Source of Infection', 'Classification','Episode Date', 'Ever in ICU')
+datas1 <- select(filtered_data,'Episode Date')
+```
+
+```{r,echo=FALSE}
+
+library(astsa)
+datas2 <- table(datas1)
+data=ts.intersect(datas2)
+data1=data[1:560]
+data2=data[561:660]
+data3=data[650:793]
+```
+
+# **2 Data**
+## 2.1 Data Source
+
+This data set is from Open Data Toronto, an Open information website supported by the Canadian government, where the data is officially certified and highly reliable. This specific page for obtaining data in this study is COVID-19 Cases in Toronto. From this page, you can directly download the CSV file about COVID-19 in Toronto provided by the authorities for subsequent use by developers. This study imported data into Rstudio from CSV files downloaded from the website.
+
+## 2.2 Data concept
+
+In this data set, a sample of nearly 32,000 documented COVID-19 cases in Toronto from 2020 to April 2022 (i.e., now) is included, along with relevant information, including date of confirmation, and date of discharge, ICU rate, and many other factors. In combination with the core purpose, I focued on cleaning up the daily total number of new cases in this group, making this group of data more convenient to study.
+
+## 2.3 Supplementary information
+
+Researchers may also be able to obtain similar data sets from official websites or institutions provided by the Government of Ontario or The Government of Canada, but since the purpose of this study is to investigate COVID-19 data related to Toronto, the information provided by Open Data Toronto may be more detailed. So this set of data is not easily replaceable.
+
+## 2.4 Variables and significance of data 
+
+Since this study aims to analyze the overall trend of the pandemic and the social impact of this trend on people, the core variable should be set as new cases per day. In the reorganization data, the corresponding information is "Episode Date”.
+
+## 2.5 Data cleansing method
+
+Now that variables and research methods have been identified, the idea of data cleansing is clear. The first step is to extract a variable named "Episode date" from a vast data containing 18 variables through the select method and name it as a group of new data. The second step is to rearrange the data. After the extraction in the previous step, the new data cannot be used directly, which represents all single cases reported by their corresponding dates. Because of this, TS.Intersect was adopted, and developers can create a new table by combining the sum of all the corresponding cases in a single date. The third step is to generate images based on the previously generated table combined with the time points I divided into different stages.
+
+## 2.6 Graphs
+
+Based on the above steps, the three images finally generated are all bar charts corresponding to the increase and change of daily cases in the period of three different stages. The X-axis of each image represents the time incrementing in days from left to the right, and the Y-axis represents the total number of cases per day. Researchers and ordinary readers can intuitively feel the changing trend of patients over time through this set of graphs
+(The three images generated from the reshuffled data are on the next page)
+
+## 2.7 Graph Analyzation
+
+I will describe the specific trend, presentation mode, characteristics and change trend of the three images generated above by means of text analysis.
+(The description of each graph will be arranged under the image)
+
+```{r, echo=FALSE,warning=FALSE}
+plot(data1)
+```
+
+In Figure 1, we can observe that the whole image is presented in a multimodal trend. In this stage, infection cases reached the local Max value increasing with time three times, respectively, in March 2020, February 2021 and April 2021, and their corresponding values were 400,1200 and 1600. In each cycle, there is a trend from a low daily total to a gradual increase to a peak and then a decline. For this set of data, the lowest values are close to 0 in early January 2020, August 2020 and June 2021, respectively.
+
+```{r, echo=FALSE,warning=FALSE}
+plot(data2)
+```
+
+As for Graph 2, we can find that the overall fluctuation is not apparent, and the infection rate increases gradually decreases and increases over time. There is no particularly prominent peak, and the lowest point is obviously in the middle stage at the end of October.
+
+```{r, echo=FALSE,warning=FALSE}
+plot(data3)
+```
+
+In Graph 3, we find a right unimodal curve at this stage, and the lowest initial value directly increases to a peak of nearly 6000, which is almost four times the maximum value in the previous two graphs. Then the number starts to drop sharply again to a lower value.
+
+
+
+# **3 Model**
+
+This is a time-series data set because the overall data is entirely consistent with the time-dependent trend. In this regard, I plan to use an ARMA model to analyze it and complete the future prediction.
+
+In order to build the model, I first observed the general trend of the whole graph through TS plot, and then used ACF2 (data3) to see whether this group of data was stationary in more detail. 
+
+According to the plot, a downward trend was observed from this data set, which indicates the data is not stationary. The log transformation was adopted to make the data consistent with our expectations for this concern.
+
+Furthermore, since the overall trend was downward, diff function was used to weaken the downward trend and make the overall trend more stationary.
+
+Based on the previous steps, I rested acf2 function on this set of data(after the log transformation). So far, the data set eventually became stationary, and it is useable for creating a model. 
+
+In order to meet the analysis purpose of predicting the increasing trend of the pandemic in future, the ARMA model should be used to predict the association between the future data by analyzing the association between the previous data to achieve this goal. sarima function was applied to build the model from the previous log(data3).
+
+Under the situation of the Toronto government abandoned much of its collection of Omicron infection data after January 2022, the data are less reliable than that in previous two years @d. So for keeping the forecast accurate, I choose to only forecasting the situation of the pandemic in the next 30 days.
+Thus, to keep the forecast accurate, I choose to only forecast the infection quantity of the pandemic in the next 30 days.
+
+By setting the predicting date as 30 days later, the function of sarima.for was adopted for modelling. Besides that, the graph was printed from this function. A model for predicting the pandemic’s trend in Toronto’s short-term future is formed from all previous procedures.
+
+## 3.2 Model Graph
+
+```{r, echo=FALSE,warning=FALSE}
+
+ts.plot(data3)
+```
+
+
+
+
+```{r, echo=FALSE,warning=FALSE}
+data4=diff(log(data3))
+acf2(data4)
+```
+```{r, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
+sarima(log(data3),0,1,7,0,0,0,0)
+pred1=sarima.for(log(data3),30,0,1,7,0,0,0,0,detail=FALSE)
+print(pred1$pred)
+```
+
+# **4 Result**
+
+
+In this report, the previous data collection, collation and generated images are collected, and we hereby make an analyzation of the whole study. The analysis is developed based on the three stages, respectively, and its purpose is to conclude the cause that led covid-19 spread. Moreover, to investigate the social influence that it made based on the previous point.
+
+## 4.1 Pre-Vaccine Stage
+
+In the pre-vaccine stage, as mentioned above, the whole changes with a multimodal tendency. In early January, the initial phase of the outbreak, the COVID-19 virus entered Toronto through transmission. Instead of spiking, the rate of infection slowly rises steadily.
+
+Subjectively speaking, considering the social situation, people did not have a big crisis over the widespread outbreak of the virus but chose to let it spread, which resulted in a rapid increase in the growth rate shown in the graph. Eventually, the first peak appeared in March 2020 (nearly 400 cases a day). According to the mortality rate of the COVID-19 was increasing at that time in Toronto, people started to pay attention on it. As a result, starting in April, COVID-19 began a gradual and steady decline, with daily new increments of the virus getting lower and lower until reaching a low point in September 2020.
+However, at this improvement stage, a mutated strain of the virus Beta entered Canada and infection rates reached a new inflection point. The images show that COVID-19 is increasing at a much faster rate from October 2020 until January 2021. The virus reached its second peak in January 2021, when it reached nearly 1,200 numbers in a single day, about three times the previous extreme.
+
+The Ontario government adopted a lockdown to control the pandemic, which has allowed the rate of infection to start falling again. Until early March 2021, although Toronto reached the second low point, the daily infected number was as high as that value in the first peak(around 400 new infections per day). 
+
+After many iterations, the government proposed the strictest lockdown strategy in April 2021. This operation allowed the infection rate of COVID-19 to drop again, and in conjunction with the gradual introduction of the first dose, it reached a low point again during May and June and slowly entered Stage2.
+
+According to the summary of stage 1, we found that the pandemic spread rapidly at this stage. In addition, the infection rate of COVID-19 itself has increased as the virus mutates. But the Ontario government has limited control, and every time it has lifted the policy, the rate of COVID-19 infection has risen dramatically and faster than before. In this regard, the pandemic is difficult to control in Toronto. From the perspective of freedom, economy and people's livelihood, it is impossible to shut down the city altogether, which leads to the repeated pandemic rate in Toronto during stage1. Ultimately, one can only hope for a vaccine.
+
+## 4.2 Post-Vaccine Stage
+
+For the Post-Vaccine stage, we can see from the graph that the overall trend of change is much more stable. The average variation of the comprehensive fluctuation range in 4 months also increased by 50 to 150 fluctuations per day.
+
+Compared with Stage1, there was no significant fluctuation in this stage. Even though the government did not impose such strict pandemic control in the second stage as in the first stage, we intuitively see that the overall pandemic infection rate did not rebound. The transmission rate declined at a slower pace from July 21 until mid-to-late October. By November, there had been a slight increase in the transmission rate, but it was still only up to 150 per day.
+
+In this regard, we can conclude that the pandemic is in a controllable stage without the government implementing measures because of the emergence of vaccines. In the overall post-vaccine step, according to the subjective impression, people's living standards have recovered to a certain extent due to reducing the pandemic infection rate. This also perfectly demonstrates that when the second Dose is administered to more than 70% of the population, it effectively controls the spread of COVID-19.
+
+## 4.3 Omicron Stage
+
+Starting in December 2021, the COVID-19 Omicron variant appeared in Toronto. From the point of view of data, the impact of the invasion of this mutant strain on the whole data is enormous. Before the Omicron outbreak, the daily peak for new cases was 1600. However, within a month of the Omicron outbreak, the daily number of new cases in Toronto rose from 200 to 6000. This is about four times the previous high.
+
+Graphically, we can see that Omicron is far more infectious than any other strain. According to the data, vaccines provide little protection against Omicron infection, even if they prevent severe illness and death. With no vaccine effective in stopping the spread of the disease, the pandemic is absolutely out of control once again.
+
+Starting in 2022, however, the number of infections fell sharply again, to just over 1,000 new infections a day. However, the reason behind this is that the government has begun to give up counting much of Omicron's information as the pandemic has spiralled out of control. The data alone cannot effectively prove the facts themselves @d.
+
+Compared with the previous two stages, Omicron Stage is the most terrible from the infection perspective because its high infection rate leads to the failure of all artificial technological and political means in Toronto.
+
+
+# **Discussion**
+
+## 5.1 Conclusion
+In general, for the Covid-19 in Toronto as a whole, from the beginning to the present, there is no general regulation no matter from which stage and each regulation are very different in the three stages.
+
+The overall trend of the Covid-19 has been very irregular over the past two years, and the only thing we can see is that the two factors that have caused the biggest change in the number of infections in Toronto are human technology (vaccines) and the variation of the virus itself @a.
+
+In the post-vaccine Stage, which is undoubtedly the moment with the most negligible impact on people after the outbreak of COVID-19 in Toronto, the Vaccine can effectively prevent severe illness and transmission, and the transmission rate of the virus itself is not as high as Omicron so that people can live at ease both psychologically and physically.
+
+In the pre-vaccine Stage, the pandemic is not controllable because there is no effective means of restriction, no matter in political management or Vaccine, so it is a Stage with the most significant fluctuation. In addition, compared with the other two stages, the virus posed a more significant threat to human health, so the lockdown policy was the most severe period. This creates enormous health and economic risks for people.
+
+However, in Omicron Stage from the point of view from multiple aspect include economics, livelihood... even though the data is frightening, people's lives have not been significantly affected because of the popularization of the vaccine, which can effectively prevent severe diseases and is less lethal than the previous varieties @a.
+
+## 5.2 Toronto's Future Based On The Model
+From the perspective of the virus itself, it has now reached an irreversible stage of development. Although Omicron virus is spreading at an unstoppable speed, as shown in Stage3 in the data, Covid-19 is far less lethal than its less transmissible predecessor @johnson2022covid. So, on the other hand, COVID-19, after two years of change, is moving in a similar direction to regular flu, and people will have to adapt to living with the virus for a long time in the future anyway.
+
+From the perspective of data, even though Toronto has no longer made comprehensive statistics on COVID-19 cases since 2022, the statistics are still representative.Therefore, the results predicted by the model are also representative to a certain extent.Based on the model's information, there is a slow decline in the local pandemic in Toronto in the short term, which may have been triggered by the increasing herd immunity that had previously resulted from many people infected with Omicron. This also means that in the coming month, people will be less and less affected by COVID-19.
+
+Combined with the above, one prediction is that even if the Pandemic does not end anytime soon, it will continue to change for the better. In addition, considering the characteristics of the mutation of the virus itself is getting not as vital as before and the progress of human technology can effective prevent the healthy risk from covid @johnson2022covid, I believe that Toronto will gradually return to the state of pre-covid in the future.
+
+
+
+## 5.3 Weakness and Limitation
+From the perspective of data statistics, the data of this group is generally very reliable, the overall cleaning process is less complicated than expected, and there are not too many problems with Missing data. However, objectively speaking, there are at least two weaknesses in this data set. 
+The first is that there may be a lot of uncounted cases in society. Because this is a society-based study, data on self-test kits and asymptomatic infections are hard to come by. As a result, dyeing data cannot be counted. Although this data set can essentially represent the true spread of the pandemic in Toronto, it cannot be 100% representative.
+Secondly, after the outbreak of Omicron, because of the rapid spread of Omicron, many departments have stopped counting Omicron @d. Although the data obtained daily are somewhat representative, they are no longer very reliable.
+To sum up, even if the official government data is reliable, it still has limitations.
+
+\newpage
+
+# Reference
